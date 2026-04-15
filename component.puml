@@ -1,0 +1,23 @@
+@startuml
+
+package "Order Service" {
+  [HTTP API] as Api
+  [Command Handlers] as Handlers
+  [Domain Model] as Domain
+  [Repositories] as Repositories
+  [Outbox Publisher] as Publisher
+}
+
+database "PostgreSQL" as Db
+queue "Message Broker" as Broker
+[Product Service] as ProductService
+
+Api --> Handlers
+Handlers --> Domain
+Handlers --> Repositories
+Handlers --> ProductService : validate products
+Repositories --> Db
+Publisher --> Db : read outbox
+Publisher --> Broker : publish integration events
+
+@enduml

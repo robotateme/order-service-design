@@ -5,6 +5,7 @@
 ## Состав репозитория
 
 - `architecture.puml` — архитектурная диаграмма по слоям: `Interface`, `Application`, `Domain`, `Infrastructure`.
+- `component.puml` — компонентная диаграмма взаимодействия API, домена, БД, брокера и внешних сервисов.
 - `database.puml` — ER-диаграмма таблиц заказов, доставок и платежей.
 - `order-state.puml` — диаграмма состояний заказа от создания до завершения или отмены.
 - `sequence.puml` — диаграмма последовательности для сценария `createOrder`.
@@ -90,6 +91,17 @@
 - `Completed` — заказ успешно получен;
 - `Cancelled` — заказ отменен на допустимом этапе.
 
+## Компоненты системы
+
+Компонентная диаграмма показывает основные runtime-части решения:
+
+- `HTTP API` принимает внешние запросы;
+- `Command Handlers` координируют use case;
+- `Domain Model` содержит бизнес-правила;
+- `Repositories` работают с `PostgreSQL`;
+- `Outbox Publisher` публикует интеграционные события в брокер;
+- `Product Service` используется для валидации товаров.
+
 ## Как открыть диаграммы
 
 Диаграммы написаны в формате PlantUML. Их можно открыть:
@@ -101,7 +113,7 @@
 Пример локального рендера:
 
 ```bash
-plantuml architecture.puml database.puml order-state.puml sequence.puml
+plantuml architecture.puml component.puml database.puml order-state.puml sequence.puml
 ```
 
 После этого рядом с `.puml` файлами будут созданы изображения диаграмм.
