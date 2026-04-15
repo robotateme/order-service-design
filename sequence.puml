@@ -5,8 +5,6 @@ participant Controller
 participant Handler
 participant ProductService
 participant OrderRepository
-participant DeliveryRepository
-participant PaymentRepository
 participant OutboxRepository
 participant IntegrationEventMapper
 participant OutboxPublisher
@@ -25,14 +23,8 @@ Handler -> Handler : validatePayment
 group DB transaction
 Handler -> Handler : create Order aggregate
 Handler -> Handler : Order records OrderCreatedDomainEvent
-Handler -> OrderRepository : save Order
+Handler -> OrderRepository : save Order aggregate
 OrderRepository --> Handler : orderId
-
-Handler -> OrderRepository : save OrderItems
-
-Handler -> DeliveryRepository : save Delivery
-
-Handler -> PaymentRepository : save Payment
 
 Handler -> Handler : pullDomainEvents()
 Handler -> IntegrationEventMapper : map domain to integration event

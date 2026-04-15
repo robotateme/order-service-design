@@ -40,13 +40,14 @@ HttpController --> CreateOrderCommand
 CreateOrderCommand --> CreateOrderHandler
 
 CreateOrderHandler --> Order
-CreateOrderHandler --> Delivery
-CreateOrderHandler --> Payment
 CreateOrderHandler --> IntegrationEventMapper
 
 CreateOrderHandler --> OrderRepository
 CreateOrderHandler --> OutboxRepository
 
+Order *-- OrderItem
+Order *-- Delivery
+Order *-- Payment
 Order --> DomainEvent : records
 Order --> OrderCreatedDomainEvent
 DomainEvent <|-- OrderCreatedDomainEvent
