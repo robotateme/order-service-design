@@ -72,11 +72,30 @@ published_at
 orders ||--o{ order_items
 orders ||--|| deliveries
 orders ||--|| payments
-orders ||--o{ outbox_events
 
 deliveries ||--|| delivery_pickup
 deliveries ||--|| delivery_address
 
 payments ||--|| payment_credit
+
+note right of outbox_events
+Generic outbox table.
+aggregate_type + aggregate_id
+reference any aggregate in the service.
+No direct FK to orders.
+end note
+
+note bottom of deliveries
+Exactly one subtype must exist
+for each delivery row,
+based on deliveries.type.
+end note
+
+note bottom of payments
+payment_credit exists only
+for payments.type = credit.
+Other payment types do not
+have subtype rows.
+end note
 
 @enduml
