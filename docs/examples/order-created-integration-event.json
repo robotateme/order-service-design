@@ -1,0 +1,33 @@
+{
+  "messageId": "9d0b6b5b-4d0f-4f18-9e75-5fd4e6a13f8a",
+  "eventType": "OrderCreatedIntegrationEvent",
+  "occurredAt": "2026-04-16T10:15:30Z",
+  "aggregateType": "Order",
+  "aggregateId": "ORD-2026-000123",
+  "payload": {
+    "orderId": "ORD-2026-000123",
+    "userId": "USR-501",
+    "status": "PendingPayment",
+    "totalAmount": 14990,
+    "currency": "RUB",
+    "deliveryType": "PickupDelivery",
+    "paymentType": "CardPayment",
+    "items": [
+      {
+        "productId": "SKU-1001",
+        "quantity": 1,
+        "price": 9990
+      },
+      {
+        "productId": "SKU-1002",
+        "quantity": 1,
+        "price": 5000
+      }
+    ]
+  },
+  "headers": {
+    "schemaVersion": "1.0",
+    "traceId": "7f2d2b0f21d94d97",
+    "producer": "order-service"
+  }
+}
