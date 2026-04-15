@@ -1,0 +1,22 @@
+@startuml
+
+[*] --> Draft
+
+Draft --> PendingPayment : placeOrder
+PendingPayment --> Paid : paymentCaptured
+PendingPayment --> Cancelled : paymentFailed / cancelRequested
+
+Paid --> ReadyForPickup : pickupPrepared
+Paid --> Shipped : courierAssigned
+
+ReadyForPickup --> Completed : pickedUp
+Shipped --> Completed : delivered
+
+Draft --> Cancelled : cancelRequested
+Paid --> Cancelled : refundApproved
+ReadyForPickup --> Cancelled : refundApproved
+
+Cancelled --> [*]
+Completed --> [*]
+
+@enduml
