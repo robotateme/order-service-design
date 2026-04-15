@@ -4,13 +4,13 @@
 
 ## Состав репозитория
 
-- `architecture.puml` — архитектурная диаграмма по слоям: `Interface`, `Application`, `Domain`, `Infrastructure`.
-- `component.puml` — компонентная диаграмма взаимодействия API, домена, БД, брокера и внешних сервисов.
-- `database.puml` — ER-диаграмма таблиц заказов, доставок и платежей.
-- `docs/adr/ADR-001-outbox-pattern.md` — архитектурное решение по использованию outbox pattern.
-- `docs/examples/order-created-integration-event.json` — пример контракта интеграционного события.
-- `order-state.puml` — диаграмма состояний заказа от создания до завершения или отмены.
-- `sequence.puml` — диаграмма последовательности для сценария `createOrder`.
+- [`architecture.puml`](architecture.puml) — архитектурная диаграмма по слоям: `Interface`, `Application`, `Domain`, `Infrastructure`.
+- [`component.puml`](component.puml) — компонентная диаграмма взаимодействия API, домена, БД, брокера и внешних сервисов.
+- [`database.puml`](database.puml) — ER-диаграмма таблиц заказов, доставок и платежей.
+- [`docs/adr/ADR-001-outbox-pattern.md`](docs/adr/ADR-001-outbox-pattern.md) — архитектурное решение по использованию outbox pattern.
+- [`docs/examples/order-created-integration-event.json`](docs/examples/order-created-integration-event.json) — пример контракта интеграционного события.
+- [`order-state.puml`](order-state.puml) — диаграмма состояний заказа от создания до завершения или отмены.
+- [`sequence.puml`](sequence.puml) — диаграмма последовательности для сценария `createOrder`.
 
 ## Что описывает модель
 
@@ -86,13 +86,13 @@
 
 В репозитории добавлен ADR с фиксацией выбора `Outbox Pattern`, его альтернатив и последствий:
 
-- [docs/adr/ADR-001-outbox-pattern.md](/home/oem/Work/test_project/docs/adr/ADR-001-outbox-pattern.md)
+- [`docs/adr/ADR-001-outbox-pattern.md`](docs/adr/ADR-001-outbox-pattern.md)
 
 ## Пример события
 
 Для интеграционного контракта добавлен пример JSON-сообщения:
 
-- [docs/examples/order-created-integration-event.json](/home/oem/Work/test_project/docs/examples/order-created-integration-event.json)
+- [`docs/examples/order-created-integration-event.json`](docs/examples/order-created-integration-event.json)
 
 ## Жизненный цикл заказа
 
