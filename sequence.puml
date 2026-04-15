@@ -1,0 +1,58 @@
+@startuml
+
+actor Client
+participant Controller
+participant Handler
+participant ProductService
+participant OrderRepository
+participant DeliveryRepository
+participant PaymentRepository
+participant OutboxRepository
+participant IntegrationEventMapper
+participant OutboxPublisher
+participant MessageBrokerClient
+database DB
+
+Client -> Controller : createOrder request
+Controller -> Handler : CreateOrderCommand
+
+Handler -> ProductService : validateProducts
+ProductService --> Handler : ok
+
+Handler -> Handler : validateDelivery
+Handler -> Handler : validatePayment
+
+group DB transaction
+Handler -> Handler : create Order aggregate
+Handler -> Handler : Order records OrderCreatedDomainEvent
+Handler -> OrderRepository : save Order
+OrderRepository --> Handler : orderId
+
+Handler -> OrderRepository : save OrderItems
+
+Handler -> DeliveryRepository : save Delivery
+
+Handler -> PaymentRepository : save Payment
+
+Handler -> Handler : pullDomainEvents()
+Handler -> IntegrationEventMapper : map domain to integration event
+IntegrationEventMapper --> Handler : OrderCreatedIntegrationEvent
+Handler -> OutboxRepository : save OutboxEvent(status=pending)
+OutboxRepository -> DB : commit order + outbox atomically
+end
+
+Handler --> Controller : success
+Controller --> Client : response
+
+OutboxPublisher -> OutboxRepository : lock pending events\nFOR UPDATE SKIP LOCKED
+OutboxRepository --> OutboxPublisher : events
+OutboxPublisher -> MessageBrokerClient : publish OrderCreatedIntegrationEvent
+alt publish success
+MessageBrokerClient --> OutboxPublisher : ack
+OutboxPublisher -> OutboxRepository : mark as published
+else publish failed
+MessageBrokerClient --> OutboxPublisher : error
+OutboxPublisher -> OutboxRepository : increment retry_count,\nsave error, set next_retry_at
+end
+
+@enduml

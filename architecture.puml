@@ -1,0 +1,70 @@
+@startuml
+
+package Application {
+class CreateOrderCommand
+class CreateOrderHandler
+class OutboxPublisher
+class IntegrationEventMapper
+}
+
+package Domain {
+class Order
+class OrderItem
+abstract class DomainEvent
+class OrderCreatedDomainEvent
+abstract class Delivery
+class PickupDelivery
+class AddressDelivery
+
+abstract class Payment
+class CardPayment
+class CreditPayment
+}
+
+package Infrastructure {
+class OrderRepository
+class PaymentRepository
+class DeliveryRepository
+class OutboxRepository
+class MessageBrokerClient
+class IntegrationEvent
+class OrderCreatedIntegrationEvent
+}
+
+package Interface {
+class HttpController
+}
+
+HttpController --> CreateOrderCommand
+CreateOrderCommand --> CreateOrderHandler
+
+CreateOrderHandler --> Order
+CreateOrderHandler --> Delivery
+CreateOrderHandler --> Payment
+CreateOrderHandler --> IntegrationEventMapper
+
+CreateOrderHandler --> OrderRepository
+CreateOrderHandler --> DeliveryRepository
+CreateOrderHandler --> PaymentRepository
+CreateOrderHandler --> OutboxRepository
+
+Order --> DomainEvent : records
+Order --> OrderCreatedDomainEvent
+DomainEvent <|-- OrderCreatedDomainEvent
+CreateOrderHandler --> Order : pullDomainEvents()
+IntegrationEventMapper --> DomainEvent
+IntegrationEventMapper --> IntegrationEvent
+IntegrationEvent <|-- OrderCreatedIntegrationEvent
+
+Delivery <|-- PickupDelivery
+Delivery <|-- AddressDelivery
+
+Payment <|-- CardPayment
+Payment <|-- CreditPayment
+
+OutboxPublisher --> OutboxRepository
+OutboxPublisher --> MessageBrokerClient
+OutboxPublisher --> IntegrationEvent
+MessageBrokerClient --> OrderCreatedIntegrationEvent
+
+@enduml

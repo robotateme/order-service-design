@@ -1,0 +1,82 @@
+@startuml
+entity orders {
+id PK
+user_id FK
+contact_phone
+contact_email
+status
+created_at
+}
+
+entity order_items {
+id PK
+order_id FK
+product_id FK
+quantity
+price
+}
+
+entity deliveries {
+id PK
+order_id FK
+type
+}
+
+entity delivery_pickup {
+id PK
+delivery_id FK
+pickup_point_id
+}
+
+entity delivery_address {
+id PK
+delivery_id FK
+city
+street
+house
+apartment
+}
+
+entity payments {
+id PK
+order_id FK
+type
+status
+}
+
+entity payment_credit {
+id PK
+payment_id FK
+provider_name
+months
+}
+
+entity outbox_events {
+id PK
+message_id
+aggregate_type
+aggregate_id
+event_type
+payload_json
+headers_json
+status
+retry_count
+error_message
+next_retry_at
+locked_by
+locked_at
+occurred_at
+published_at
+}
+
+orders ||--o{ order_items
+orders ||--|| deliveries
+orders ||--|| payments
+orders ||--o{ outbox_events
+
+deliveries ||--|| delivery_pickup
+deliveries ||--|| delivery_address
+
+payments ||--|| payment_credit
+
+@enduml
