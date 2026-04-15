@@ -5,6 +5,9 @@ class CreateOrderCommand
 class CreateOrderHandler
 class OutboxPublisher
 class IntegrationEventMapper
+interface OrderRepository
+interface OutboxRepository
+interface MessageBrokerPort
 }
 
 package Domain {
@@ -22,10 +25,8 @@ class CreditPayment
 }
 
 package Infrastructure {
-class OrderRepository
-class PaymentRepository
-class DeliveryRepository
-class OutboxRepository
+class SqlOrderRepository
+class SqlOutboxRepository
 class MessageBrokerClient
 class IntegrationEvent
 class OrderCreatedIntegrationEvent
@@ -44,8 +45,6 @@ CreateOrderHandler --> Payment
 CreateOrderHandler --> IntegrationEventMapper
 
 CreateOrderHandler --> OrderRepository
-CreateOrderHandler --> DeliveryRepository
-CreateOrderHandler --> PaymentRepository
 CreateOrderHandler --> OutboxRepository
 
 Order --> DomainEvent : records
@@ -63,8 +62,11 @@ Payment <|-- CardPayment
 Payment <|-- CreditPayment
 
 OutboxPublisher --> OutboxRepository
-OutboxPublisher --> MessageBrokerClient
+OutboxPublisher --> MessageBrokerPort
 OutboxPublisher --> IntegrationEvent
+SqlOrderRepository ..|> OrderRepository
+SqlOutboxRepository ..|> OutboxRepository
+MessageBrokerClient ..|> MessageBrokerPort
 MessageBrokerClient --> OrderCreatedIntegrationEvent
 
 @enduml
