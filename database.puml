@@ -98,5 +98,4 @@ for payments.type = credit.
 Other payment types do not
 have subtype rows.
 end note
-
 @enduml

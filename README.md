@@ -6,9 +6,14 @@
 
 - [`architecture.puml`](architecture.puml) — архитектурная диаграмма по слоям: `Interface`, `Application`, `Domain`, `Infrastructure`.
 - [`component.puml`](component.puml) — компонентная диаграмма взаимодействия API, домена, БД, брокера и внешних сервисов.
+- [`consumer-flow.puml`](consumer-flow.puml) — поток обработки интеграционного события на стороне consumer с inbox и idempotency.
 - [`database.puml`](database.puml) — ER-диаграмма таблиц заказов, доставок и платежей.
+- [`deployment.puml`](deployment.puml) — диаграмма развертывания API, worker, БД, брокера и внешних зависимостей.
 - [`docs/adr/ADR-001-outbox-pattern.md`](docs/adr/ADR-001-outbox-pattern.md) — архитектурное решение по использованию outbox pattern.
+- [`docs/error-scenarios.md`](docs/error-scenarios.md) — типовые сценарии отказов и ожидаемое поведение системы.
 - [`docs/examples/order-created-integration-event.json`](docs/examples/order-created-integration-event.json) — пример контракта интеграционного события.
+- [`docs/examples/order-created-integration-event.schema.json`](docs/examples/order-created-integration-event.schema.json) — JSON Schema для события создания заказа.
+- [`docs/event-versioning.md`](docs/event-versioning.md) — правила эволюции event-контрактов.
 - [`order-state.puml`](order-state.puml) — диаграмма состояний заказа от создания до завершения или отмены.
 - [`sequence.puml`](sequence.puml) — диаграмма последовательности для сценария `createOrder`.
 
@@ -59,7 +64,7 @@
 - `payment_credit` — данные кредитной оплаты.
 - `outbox_events` — очередь интеграционных событий для гарантированной публикации.
 
-Такой подход позволяет хранить общие атрибуты в базовых таблицах, выносить специализированные поля в отдельные таблицы по типу доставки или оплаты и отдельно фиксировать события, которые должны быть опубликованы во внешние системы. `outbox_events` при этом моделируется как общая таблица сервиса, а не как таблица, жестко привязанная только к заказам.
+Такой подход позволяет хранить общие атрибуты в базовых таблицах, выносить специализированные поля в отдельные таблицы по типу доставки или оплаты и отдельно фиксировать события, которые должны быть опубликованы во внешние системы. `outbox_events` моделируется как общая таблица сервиса и связывается с бизнес-сущностями через `aggregate_type` и `aggregate_id`, а не через жесткий FK только на `orders`.
 
 В `outbox_events` дополнительно предусмотрены технические поля:
 
@@ -140,10 +145,22 @@
 - `IntegrationEventMapper` преобразует внутреннее событие домена во внешний контракт;
 - интеграционные события живут на границе сервиса как отдельный контрактный слой, а не как инфраструктурная деталь;
 - отдельный `OutboxPublisher` выбирает и блокирует неопубликованные события;
-- после успешной отправки в брокер запись помечается как опубликованная;
-- при ошибке запись не теряется, а переходит в повторную обработку.
+- перед публикацией запись переводится в `processing` и фиксирует `locked_by`/`locked_at`;
+- после успешной отправки в брокер запись помечается как опубликованная и освобождает блокировку;
+- при ошибке запись не теряется, освобождает блокировку и переходит в повторную обработку.
 
 Это нужно, чтобы не терять события в ситуации, когда бизнес-транзакция уже закоммичена, а отправка в брокер еще не произошла или завершилась ошибкой. Отдельный `message_id` и явный retry-flow также уменьшают риск дублей и делают поведение системы предсказуемым при сбоях.
+
+## Consumer и Inbox
+
+Для end-to-end надежности добавлен сценарий обработки на стороне consumer:
+
+- consumer читает событие из брокера;
+- `messageId` сначала фиксируется в inbox-хранилище;
+- если сообщение уже обрабатывалось, оно пропускается как дубликат;
+- если сообщение новое, выполняется бизнес-обработка и запись помечается как обработанная.
+
+Это закрывает вторую половину задачи идемпотентности: outbox снижает риск потери события у producer, inbox снижает риск повторной обработки у consumer.
 
 ## Архитектурные решения
 
@@ -151,11 +168,24 @@
 
 - [`docs/adr/ADR-001-outbox-pattern.md`](docs/adr/ADR-001-outbox-pattern.md)
 
+## Сценарии отказов
+
+Отдельный документ описывает, как система должна вести себя при проблемах в БД, брокере и consumer-обработке:
+
+- [`docs/error-scenarios.md`](docs/error-scenarios.md)
+
 ## Пример события
 
 Для интеграционного контракта добавлен пример JSON-сообщения:
 
 - [`docs/examples/order-created-integration-event.json`](docs/examples/order-created-integration-event.json)
+- [`docs/examples/order-created-integration-event.schema.json`](docs/examples/order-created-integration-event.schema.json)
+
+## Версионирование событий
+
+Чтобы контракты можно было развивать без хаотичных поломок consumer-ов, добавлен отдельный документ:
+
+- [`docs/event-versioning.md`](docs/event-versioning.md)
 
 ## Жизненный цикл заказа
 
@@ -179,6 +209,16 @@
 - `Outbox Publisher` публикует интеграционные события в брокер;
 - `Product Service` используется для валидации товаров.
 
+## Развертывание
+
+Диаграмма развертывания показывает базовую инфраструктурную схему:
+
+- клиент обращается к `Order Service API`;
+- API и `Outbox Publisher Worker` развернуты отдельно;
+- бизнес-данные и outbox хранятся в `PostgreSQL`;
+- события публикуются во внешний `Message Broker`;
+- валидация товаров идет через отдельный `Product Service`.
+
 ## Как открыть диаграммы
 
 Диаграммы написаны в формате PlantUML. Их можно открыть:
@@ -190,7 +230,7 @@
 Пример локального рендера:
 
 ```bash
-plantuml architecture.puml component.puml database.puml order-state.puml sequence.puml
+plantuml architecture.puml component.puml consumer-flow.puml database.puml deployment.puml order-state.puml sequence.puml
 ```
 
 После этого рядом с `.puml` файлами будут созданы изображения диаграмм.
