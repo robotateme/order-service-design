@@ -11,6 +11,7 @@
 - [`deployment.puml`](deployment.puml) — диаграмма развертывания API, worker, БД, брокера и внешних зависимостей.
 - [`docs/adr/ADR-001-outbox-pattern.md`](docs/adr/ADR-001-outbox-pattern.md) — архитектурное решение по использованию outbox pattern.
 - [`docs/error-scenarios.md`](docs/error-scenarios.md) — типовые сценарии отказов и ожидаемое поведение системы.
+- [`docs/operational-notes.md`](docs/operational-notes.md) — минимальные правила эксплуатации outbox, retry и обработки зависших записей.
 - [`docs/examples/order-created-integration-event.json`](docs/examples/order-created-integration-event.json) — пример контракта интеграционного события.
 - [`docs/examples/order-created-integration-event.schema.json`](docs/examples/order-created-integration-event.schema.json) — JSON Schema для события создания заказа.
 - [`docs/event-versioning.md`](docs/event-versioning.md) — правила эволюции event-контрактов.
@@ -174,6 +175,12 @@
 
 - [`docs/error-scenarios.md`](docs/error-scenarios.md)
 
+## Эксплуатационные заметки
+
+Короткие заметки по retry, `failed`-событиям и зависшим `processing` записям вынесены отдельно:
+
+- [`docs/operational-notes.md`](docs/operational-notes.md)
+
 ## Пример события
 
 Для интеграционного контракта добавлен пример JSON-сообщения:
@@ -234,3 +241,13 @@ plantuml architecture.puml component.puml consumer-flow.puml database.puml deplo
 ```
 
 После этого рядом с `.puml` файлами будут созданы изображения диаграмм.
+
+## Минимальная проверка
+
+Для базовой проверки репозитория без внешних зависимостей можно выполнить:
+
+```bash
+make validate
+```
+
+Команда проверяет пример интеграционного события и просто пробегается по PlantUML-файлам.
