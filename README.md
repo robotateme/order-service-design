@@ -7,6 +7,7 @@
 - [`architecture.puml`](architecture.puml) — архитектурная диаграмма по слоям: `Interface`, `Application`, `Domain`, `Infrastructure`.
 - [`component.puml`](component.puml) — компонентная диаграмма взаимодействия API, домена, БД, брокера и внешних сервисов.
 - [`database.puml`](database.puml) — ER-диаграмма таблиц заказов, доставок и платежей.
+- [`deployment.puml`](deployment.puml) — диаграмма развертывания API, worker, БД, брокера и внешних зависимостей.
 - [`docs/adr/ADR-001-outbox-pattern.md`](docs/adr/ADR-001-outbox-pattern.md) — архитектурное решение по использованию outbox pattern.
 - [`docs/examples/order-created-integration-event.json`](docs/examples/order-created-integration-event.json) — пример контракта интеграционного события.
 - [`order-state.puml`](order-state.puml) — диаграмма состояний заказа от создания до завершения или отмены.
@@ -116,6 +117,16 @@
 - `Outbox Publisher` публикует интеграционные события в брокер;
 - `Product Service` используется для валидации товаров.
 
+## Развертывание
+
+Диаграмма развертывания показывает базовую инфраструктурную схему:
+
+- клиент обращается к `Order Service API`;
+- API и `Outbox Publisher Worker` развернуты отдельно;
+- бизнес-данные и outbox хранятся в `PostgreSQL`;
+- события публикуются во внешний `Message Broker`;
+- валидация товаров идет через отдельный `Product Service`.
+
 ## Как открыть диаграммы
 
 Диаграммы написаны в формате PlantUML. Их можно открыть:
@@ -127,7 +138,7 @@
 Пример локального рендера:
 
 ```bash
-plantuml architecture.puml component.puml database.puml order-state.puml sequence.puml
+plantuml architecture.puml component.puml database.puml deployment.puml order-state.puml sequence.puml
 ```
 
 После этого рядом с `.puml` файлами будут созданы изображения диаграмм.

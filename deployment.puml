@@ -1,0 +1,31 @@
+@startuml
+
+node "Client Device" {
+  artifact "Web / Mobile Client" as Client
+}
+
+node "Cloud / Data Center" {
+  node "Kubernetes Cluster" {
+    node "API Pod" {
+      artifact "Order Service API" as Api
+    }
+
+    node "Worker Pod" {
+      artifact "Outbox Publisher Worker" as Publisher
+    }
+  }
+
+  database "PostgreSQL" as Db
+  queue "Message Broker" as Broker
+  node "External Product Service" {
+    artifact "Product Service API" as ProductService
+  }
+}
+
+Client --> Api : HTTPS
+Api --> Db : SQL
+Api --> ProductService : HTTP/gRPC
+Publisher --> Db : poll outbox
+Publisher --> Broker : publish events
+
+@enduml
