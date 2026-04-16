@@ -6,6 +6,7 @@
 
 - [`architecture.puml`](architecture.puml) — архитектурная диаграмма по слоям: `Interface`, `Application`, `Domain`, `Infrastructure`.
 - [`component.puml`](component.puml) — компонентная диаграмма взаимодействия API, домена, БД, брокера и внешних сервисов.
+- [`consumer-flow.puml`](consumer-flow.puml) — поток обработки интеграционного события на стороне consumer с inbox и idempotency.
 - [`database.puml`](database.puml) — ER-диаграмма таблиц заказов, доставок и платежей.
 - [`deployment.puml`](deployment.puml) — диаграмма развертывания API, worker, БД, брокера и внешних зависимостей.
 - [`docs/adr/ADR-001-outbox-pattern.md`](docs/adr/ADR-001-outbox-pattern.md) — архитектурное решение по использованию outbox pattern.
@@ -83,6 +84,17 @@
 
 Это нужно, чтобы не терять события в ситуации, когда бизнес-транзакция уже закоммичена, а отправка в брокер еще не произошла или завершилась ошибкой. Отдельный `message_id` и явный retry-flow также уменьшают риск дублей и делают поведение системы предсказуемым при сбоях.
 
+## Consumer и Inbox
+
+Для end-to-end надежности добавлен сценарий обработки на стороне consumer:
+
+- consumer читает событие из брокера;
+- `messageId` сначала фиксируется в inbox-хранилище;
+- если сообщение уже обрабатывалось, оно пропускается как дубликат;
+- если сообщение новое, выполняется бизнес-обработка и запись помечается как обработанная.
+
+Это закрывает вторую половину задачи идемпотентности: outbox снижает риск потери события у producer, inbox снижает риск повторной обработки у consumer.
+
 ## Архитектурные решения
 
 В репозитории добавлен ADR с фиксацией выбора `Outbox Pattern`, его альтернатив и последствий:
@@ -138,7 +150,7 @@
 Пример локального рендера:
 
 ```bash
-plantuml architecture.puml component.puml database.puml deployment.puml order-state.puml sequence.puml
+plantuml architecture.puml component.puml consumer-flow.puml database.puml deployment.puml order-state.puml sequence.puml
 ```
 
 После этого рядом с `.puml` файлами будут созданы изображения диаграмм.

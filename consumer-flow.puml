@@ -1,0 +1,23 @@
+@startuml
+
+participant MessageBroker
+participant Consumer
+participant InboxRepository
+participant DomainService
+database DB
+
+MessageBroker -> Consumer : OrderCreatedIntegrationEvent
+Consumer -> InboxRepository : save messageId if not exists
+
+alt first delivery
+InboxRepository -> DB : insert inbox record
+Consumer -> DomainService : process event
+DomainService --> Consumer : success
+Consumer -> InboxRepository : mark as processed
+Consumer --> MessageBroker : ack
+else duplicate delivery
+InboxRepository --> Consumer : duplicate messageId
+Consumer --> MessageBroker : ack and skip
+end
+
+@enduml
