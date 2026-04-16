@@ -62,11 +62,11 @@
               "quantity": { "type": "integer", "minimum": 1 },
               "price": { "type": "integer", "minimum": 0 }
             },
-            "additionalProperties": false
+            "additionalProperties": true
           }
         }
       },
-      "additionalProperties": false
+      "additionalProperties": true
     },
     "headers": {
       "type": "object",
@@ -79,5 +79,5 @@
       "additionalProperties": true
     }
   },
-  "additionalProperties": false
+  "additionalProperties": true
 }

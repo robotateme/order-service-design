@@ -45,14 +45,15 @@ Handler --> Controller : success
 Controller --> Client : response
 
 OutboxPublisher -> OutboxRepository : lock pending events\nFOR UPDATE SKIP LOCKED
+OutboxPublisher -> OutboxRepository : mark as processing,\nset locked_by, locked_at
 OutboxRepository --> OutboxPublisher : events
 OutboxPublisher -> MessageBrokerClient : publish OrderCreatedIntegrationEvent
 alt publish success
 MessageBrokerClient --> OutboxPublisher : ack
-OutboxPublisher -> OutboxRepository : mark as published
+OutboxPublisher -> OutboxRepository : mark as published,\nclear lock fields
 else publish failed
 MessageBrokerClient --> OutboxPublisher : error
-OutboxPublisher -> OutboxRepository : increment retry_count,\nsave error, set next_retry_at
+OutboxPublisher -> OutboxRepository : increment retry_count,\nsave error, set next_retry_at,\nclear lock fields, set pending/failed
 end
 
 @enduml
