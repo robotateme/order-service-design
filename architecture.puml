@@ -24,12 +24,15 @@ class CardPayment
 class CreditPayment
 }
 
+package Integration {
+class IntegrationEvent
+class OrderCreatedIntegrationEvent
+}
+
 package Infrastructure {
 class SqlOrderRepository
 class SqlOutboxRepository
 class MessageBrokerClient
-class IntegrationEvent
-class OrderCreatedIntegrationEvent
 }
 
 package Interface {

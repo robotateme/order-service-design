@@ -65,6 +65,7 @@ error_message
 next_retry_at
 locked_by
 locked_at
+processing_started_at
 occurred_at
 published_at
 }
