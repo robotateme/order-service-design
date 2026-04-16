@@ -1,0 +1,83 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/schemas/order-created-integration-event.schema.json",
+  "title": "OrderCreatedIntegrationEvent",
+  "type": "object",
+  "required": [
+    "messageId",
+    "eventType",
+    "occurredAt",
+    "aggregateType",
+    "aggregateId",
+    "payload",
+    "headers"
+  ],
+  "properties": {
+    "messageId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "eventType": {
+      "type": "string",
+      "const": "OrderCreatedIntegrationEvent"
+    },
+    "occurredAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "aggregateType": {
+      "type": "string",
+      "const": "Order"
+    },
+    "aggregateId": {
+      "type": "string"
+    },
+    "payload": {
+      "type": "object",
+      "required": [
+        "orderId",
+        "userId",
+        "status",
+        "totalAmount",
+        "currency",
+        "deliveryType",
+        "paymentType",
+        "items"
+      ],
+      "properties": {
+        "orderId": { "type": "string" },
+        "userId": { "type": "string" },
+        "status": { "type": "string" },
+        "totalAmount": { "type": "integer" },
+        "currency": { "type": "string" },
+        "deliveryType": { "type": "string" },
+        "paymentType": { "type": "string" },
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["productId", "quantity", "price"],
+            "properties": {
+              "productId": { "type": "string" },
+              "quantity": { "type": "integer", "minimum": 1 },
+              "price": { "type": "integer", "minimum": 0 }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "headers": {
+      "type": "object",
+      "required": ["schemaVersion", "traceId", "producer"],
+      "properties": {
+        "schemaVersion": { "type": "string" },
+        "traceId": { "type": "string" },
+        "producer": { "type": "string" }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": false
+}

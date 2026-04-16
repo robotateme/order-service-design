@@ -12,6 +12,8 @@
 - [`docs/adr/ADR-001-outbox-pattern.md`](docs/adr/ADR-001-outbox-pattern.md) — архитектурное решение по использованию outbox pattern.
 - [`docs/error-scenarios.md`](docs/error-scenarios.md) — типовые сценарии отказов и ожидаемое поведение системы.
 - [`docs/examples/order-created-integration-event.json`](docs/examples/order-created-integration-event.json) — пример контракта интеграционного события.
+- [`docs/examples/order-created-integration-event.schema.json`](docs/examples/order-created-integration-event.schema.json) — JSON Schema для события создания заказа.
+- [`docs/event-versioning.md`](docs/event-versioning.md) — правила эволюции event-контрактов.
 - [`order-state.puml`](order-state.puml) — диаграмма состояний заказа от создания до завершения или отмены.
 - [`sequence.puml`](sequence.puml) — диаграмма последовательности для сценария `createOrder`.
 
@@ -113,6 +115,13 @@
 Для интеграционного контракта добавлен пример JSON-сообщения:
 
 - [`docs/examples/order-created-integration-event.json`](docs/examples/order-created-integration-event.json)
+- [`docs/examples/order-created-integration-event.schema.json`](docs/examples/order-created-integration-event.schema.json)
+
+## Версионирование событий
+
+Чтобы контракты можно было развивать без хаотичных поломок consumer-ов, добавлен отдельный документ:
+
+- [`docs/event-versioning.md`](docs/event-versioning.md)
 
 ## Жизненный цикл заказа
 
