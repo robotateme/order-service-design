@@ -10,6 +10,7 @@
 - [`database.puml`](database.puml) — ER-диаграмма таблиц заказов, доставок и платежей.
 - [`deployment.puml`](deployment.puml) — диаграмма развертывания API, worker, БД, брокера и внешних зависимостей.
 - [`docs/adr/ADR-001-outbox-pattern.md`](docs/adr/ADR-001-outbox-pattern.md) — архитектурное решение по использованию outbox pattern.
+- [`docs/error-scenarios.md`](docs/error-scenarios.md) — типовые сценарии отказов и ожидаемое поведение системы.
 - [`docs/examples/order-created-integration-event.json`](docs/examples/order-created-integration-event.json) — пример контракта интеграционного события.
 - [`order-state.puml`](order-state.puml) — диаграмма состояний заказа от создания до завершения или отмены.
 - [`sequence.puml`](sequence.puml) — диаграмма последовательности для сценария `createOrder`.
@@ -100,6 +101,12 @@
 В репозитории добавлен ADR с фиксацией выбора `Outbox Pattern`, его альтернатив и последствий:
 
 - [`docs/adr/ADR-001-outbox-pattern.md`](docs/adr/ADR-001-outbox-pattern.md)
+
+## Сценарии отказов
+
+Отдельный документ описывает, как система должна вести себя при проблемах в БД, брокере и consumer-обработке:
+
+- [`docs/error-scenarios.md`](docs/error-scenarios.md)
 
 ## Пример события
 
