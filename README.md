@@ -15,6 +15,7 @@
 - [`docs/examples/order-created-integration-event.json`](docs/examples/order-created-integration-event.json) — пример контракта интеграционного события.
 - [`docs/examples/order-created-integration-event.schema.json`](docs/examples/order-created-integration-event.schema.json) — JSON Schema для события создания заказа.
 - [`docs/event-versioning.md`](docs/event-versioning.md) — правила эволюции event-контрактов.
+- [`db/migrations/0001_init_order_service.sql`](db/migrations/0001_init_order_service.sql) — DDL-миграция PostgreSQL для основных таблиц заказа, outbox и inbox.
 - [`order-state.puml`](order-state.puml) — диаграмма состояний заказа от создания до завершения или отмены.
 - [`sequence.puml`](sequence.puml) — диаграмма последовательности для сценария `createOrder`.
 
